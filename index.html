@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin Voting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .voting-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 250px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-text {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .vote-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .vote-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .vote-button:active {
+            transform: scale(0.98);
+        }
+
+        .vote-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .vote-count {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .vote-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .total-votes {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .total-votes h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .total-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            .voting-grid {
+                gap: 30px;
+            }
+
+            .image-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 Digital Twin Voting</h1>
+        <p class="subtitle">Vote for your favorite digital twin project!</p>
+
+        <div id="successMessage" class="success-message">
+            ✓ Thank you for voting!
+        </div>
+
+        <div class="voting-grid">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <h2 class="project-title">Digital Twin 1</h2>
+                <div class="image-container">
+                    <img id="image1" src="https://via.placeholder.com/400x300/667eea/ffffff?text=Digital+Twin+1" alt="Digital Twin 1">
+                </div>
+                <button class="vote-button" onclick="vote('project1')" id="voteBtn1">
+                    Vote for Project 1
+                </button>
+                <div class="vote-label">Current Votes:</div>
+                <div class="vote-count" id="votes1">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-card">
+                <h2 class="project-title">Digital Twin 2</h2>
+                <div class="image-container">
+                    <img id="image2" src="https://via.placeholder.com/400x300/764ba2/ffffff?text=Digital+Twin+2" alt="Digital Twin 2">
+                </div>
+                <button class="vote-button" onclick="vote('project2')" id="voteBtn2">
+                    Vote for Project 2
+                </button>
+                <div class="vote-label">Current Votes:</div>
+                <div class="vote-count" id="votes2">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="total-votes">
+            <h3>Total Votes Cast</h3>
+            <div class="total-number" id="totalVotes">
+                <span class="loading">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { getDatabase, ref, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAe7yUvL2PSIoOuvbs56Y6HLzR3meP63O8",
+  authDomain: "digital-twin-voting.firebaseapp.com",
+  databaseURL: "https://digital-twin-voting-default-rtdb.firebaseio.com",
+  projectId: "digital-twin-voting",
+  storageBucket: "digital-twin-voting.firebasestorage.app",
+  messagingSenderId: "918200055396",
+  appId: "1:918200055396:web:a8a761fdb4287fa07c9171"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // References to vote counts
+        const project1Ref = ref(database, 'votes/project1');
+        const project2Ref = ref(database, 'votes/project2');
+
+        // Listen for real-time updates
+        onValue(project1Ref, (snapshot) => {
+            const votes = snapshot.val() || 0;
+            document.getElementById('votes1').textContent = votes;
+            updateTotal();
+        });
+
+        onValue(project2Ref, (snapshot) => {
+            const votes = snapshot.val() || 0;
+            document.getElementById('votes2').textContent = votes;
+            updateTotal();
+        });
+
+        // Update total votes
+        function updateTotal() {
+            const votes1 = parseInt(document.getElementById('votes1').textContent) || 0;
+            const votes2 = parseInt(document.getElementById('votes2').textContent) || 0;
+            document.getElementById('totalVotes').textContent = votes1 + votes2;
+        }
+
+        // Vote function
+        window.vote = async function(project) {
+            // Check if user has already voted
+            if (localStorage.getItem('hasVoted')) {
+                alert('You have already voted! Only one vote per person is allowed.');
+                return;
+            }
+
+            // Disable buttons
+            document.getElementById('voteBtn1').disabled = true;
+            document.getElementById('voteBtn2').disabled = true;
+
+            const voteRef = ref(database, `votes/${project}`);
+
+            try {
+                // Use transaction to increment vote count atomically
+                await runTransaction(voteRef, (currentVotes) => {
+                    return (currentVotes || 0) + 1;
+                });
+
+                // Mark user as voted
+                localStorage.setItem('hasVoted', 'true');
+                localStorage.setItem('votedFor', project);
+
+                // Show success message
+                const successMsg = document.getElementById('successMessage');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error voting:', error);
+                alert('An error occurred. Please try again.');
+                document.getElementById('voteBtn1').disabled = false;
+                document.getElementById('voteBtn2').disabled = false;
+            }
+        };
+
+        // Check if user has already voted on page load
+        if (localStorage.getItem('hasVoted')) {
+            document.getElementById('voteBtn1').disabled = true;
+            document.getElementById('voteBtn2').disabled = true;
+            const votedFor = localStorage.getItem('votedFor');
+            const btnId = votedFor === 'project1' ? 'voteBtn1' : 'voteBtn2';
+            document.getElementById(btnId).textContent = '✓ You Voted';
+        }
+    </script>
+</body>
+</html>
